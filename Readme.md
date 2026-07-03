@@ -4,6 +4,7 @@ An interactive web application for identifying and learning about invasive plant
 
 ![Green Threat](https://img.shields.io/badge/Green%20Threat-Invasive%20Plants%20Atlas-2a5934?style=for-the-badge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub Pages](https://img.shields.io/badge/Deployed-GitHub%20Pages-brightgreen)](https://strangepelmen.github.io/GreenThreat)
 
 ## ✨ Features
 

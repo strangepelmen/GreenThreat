@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Threat - Interactive Atlas of Invasive Plants</title>
+    <meta name="description" content="An interactive guide to invasive plant species worldwide. Identify, learn, and take action against green invaders.">
+    <meta name="theme-color" content="#1B3A2D">
+    <meta name="color-scheme" content="light dark">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+</head>
+<body>
+    <div class="ambient-bg" aria-hidden="true">
+        <svg class="ambient-leaf ambient-leaf-1" viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M60 10 C30 40, 10 80, 20 130 C30 150, 50 155, 60 150 C70 155, 90 150, 100 130 C110 80, 90 40, 60 10Z" stroke="currentColor" stroke-width="1" opacity="0.08"/>
+            <path d="M60 10 C60 60, 60 110, 60 150" stroke="currentColor" stroke-width="0.8" opacity="0.06"/>
+            <path d="M60 50 C40 60, 30 80, 25 100" stroke="currentColor" stroke-width="0.6" opacity="0.05"/>
+            <path d="M60 50 C80 60, 90 80, 95 100" stroke="currentColor" stroke-width="0.6" opacity="0.05"/>
+            <path d="M60 80 C45 90, 35 105, 30 120" stroke="currentColor" stroke-width="0.6" opacity="0.05"/>
+            <path d="M60 80 C75 90, 85 105, 90 120" stroke="currentColor" stroke-width="0.6" opacity="0.05"/>
+        </svg>
+        <svg class="ambient-leaf ambient-leaf-2" viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 5 C20 30, 5 70, 15 110 C25 135, 45 140, 50 135 C55 140, 75 135, 85 110 C95 70, 80 30, 50 5Z" stroke="currentColor" stroke-width="1" opacity="0.06"/>
+            <path d="M50 5 C50 50, 50 95, 50 135" stroke="currentColor" stroke-width="0.7" opacity="0.05"/>
+        </svg>
+        <svg class="ambient-leaf ambient-leaf-3" viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M40 5 C15 25, 5 55, 10 90 C18 110, 35 118, 40 115 C45 118, 62 110, 70 90 C75 55, 65 25, 40 5Z" stroke="currentColor" stroke-width="0.8" opacity="0.05"/>
+            <path d="M40 5 L40 115" stroke="currentColor" stroke-width="0.6" opacity="0.04"/>
+        </svg>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#home" class="nav-logo" aria-label="Green Threat Home">
+                <svg class="logo-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 4 C12 12, 6 22, 8 32 C10 38, 16 40, 20 38 C24 40, 30 38, 32 32 C34 22, 28 12, 20 4Z" stroke="var(--color-primary)" stroke-width="1.5" fill="none"/>
+                    <path d="M20 4 C20 16, 20 28, 20 38" stroke="var(--color-primary)" stroke-width="1" opacity="0.7"/>
+                    <path d="M20 14 C14 18, 10 24, 9 30" stroke="var(--color-primary)" stroke-width="0.8" opacity="0.5"/>
+                    <path d="M20 14 C26 18, 30 24, 31 30" stroke="var(--color-primary)" stroke-width="0.8" opacity="0.5"/>
+                </svg>
+                <span class="logo-wordmark">Green Threat</span>
+            </a>
+
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+            </button>
+
+            <div class="nav-overlay" id="navOverlay"></div>
+            <ul class="nav-menu" id="navMenu" role="menubar">
+                <li role="none"><a href="#home" class="nav-link active" role="menuitem">Home</a></li>
+                <li role="none"><a href="#catalog" class="nav-link" role="menuitem">Catalog</a></li>
+                <li role="none"><a href="#identifier" class="nav-link" role="menuitem">Identifier</a></li>
+                <li role="none"><a href="#action" class="nav-link" role="menuitem">Take Action</a></li>
+                <li role="none"><a href="#about" class="nav-link" role="menuitem">About</a></li>
+                <li class="nav-theme-item" role="none">
+                    <div class="mobile-theme-switch">
+                        <span>Theme</span>
+                        <button class="theme-switch" id="mobileThemeSwitch" aria-label="Toggle dark mode">
+                            <div class="switch-track">
+                                <div class="switch-handle">
+                                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="desktop-theme-switch">
+                <button class="theme-switch" id="desktopThemeSwitch" aria-label="Toggle dark mode">
+                    <div class="switch-track">
+                        <div class="switch-handle">
+                            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                        </div>
+                    </div>
+                </button>
+            </div>
+            <button class="nav-theme-btn" aria-label="Toggle theme">
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="page active">
+            <div class="page-container">
+                <div class="hero">
+                    <div class="hero-content">
+                        <div class="hero-eyebrow reveal-up">Open Source Ecological Project</div>
+                        <h1 class="hero-title">
+                            <span class="hero-line reveal-up">Every fifth plant</span>
+                            <span class="hero-line reveal-up">species is an <em class="hero-accent">invader</em></span>
+                        </h1>
+                        <p class="hero-text reveal-up">An interactive atlas of invasive plant species. From scientific data to practical guides for identification and control.</p>
+                        <div class="hero-buttons reveal-up">
+                            <a href="#catalog" class="btn btn-primary catalog-link">
+                                <span>Explore Catalog</span>
+                                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </a>
+                            <a href="#identifier" class="btn btn-ghost identifier-link">
+                                <span>Identify a Plant</span>
+                                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="hero-illustration" aria-hidden="true">
+                        <svg class="hero-botanical" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g class="botanical-main">
+                                <path class="draw-path" d="M250 480 C250 400, 250 320, 250 240 C250 200, 240 160, 230 120 C220 80, 210 50, 220 30" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round"/>
+                                <path class="draw-path" d="M250 380 C220 360, 180 340, 150 310 C120 280, 100 250, 90 220" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round"/>
+                                <path class="draw-path" d="M250 380 C280 360, 320 340, 350 310 C380 280, 400 250, 410 220" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round"/>
+                                <path class="draw-path" d="M250 300 C230 280, 200 260, 170 250 C140 240, 110 240, 80 250" stroke="var(--color-primary)" stroke-width="1.2" stroke-linecap="round"/>
+                                <path class="draw-path" d="M250 300 C270 280, 300 260, 330 250 C360 240, 390 240, 420 250" stroke="var(--color-primary)" stroke-width="1.2" stroke-linecap="round"/>
+                                <path class="draw-path leaf-outline" d="M90 220 C70 200, 60 170, 70 140 C80 110, 110 100, 130 120 C150 140, 140 180, 120 200 C100 220, 90 220, 90 220Z" stroke="var(--color-primary)" stroke-width="1.2"/>
+                                <path class="draw-path leaf-outline" d="M410 220 C430 200, 440 170, 430 140 C420 110, 390 100, 370 120 C350 140, 360 180, 380 200 C400 220, 410 220, 410 220Z" stroke="var(--color-primary)" stroke-width="1.2"/>
+                                <path class="draw-path leaf-outline" d="M80 250 C60 230, 40 200, 40 170 C40 140, 60 120, 80 130 C100 140, 100 170, 90 200 C80 230, 80 250, 80 250Z" stroke="var(--color-primary)" stroke-width="1"/>
+                                <path class="draw-path leaf-outline" d="M420 250 C440 230, 460 200, 460 170 C460 140, 440 120, 420 130 C400 140, 400 170, 410 200 C420 230, 420 250, 420 250Z" stroke="var(--color-primary)" stroke-width="1"/>
+                                <path class="draw-path" d="M220 30 C210 20, 200 10, 210 5 C220 0, 230 5, 235 15 C240 5, 250 0, 260 5 C270 10, 265 20, 255 30" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round"/>
+                                <circle class="draw-circle" cx="235" cy="15" r="3" stroke="var(--color-accent)" stroke-width="1" fill="none"/>
+                                <circle class="draw-circle" cx="250" cy="8" r="2" stroke="var(--color-accent)" stroke-width="0.8" fill="none"/>
+                            </g>
+                            <g class="botanical-detail">
+                                <path class="draw-path" d="M150 310 C140 320, 130 340, 135 360 C140 380, 155 385, 165 370 C175 355, 165 330, 150 310Z" stroke="var(--color-secondary)" stroke-width="0.8" opacity="0.6"/>
+                                <path class="draw-path" d="M350 310 C360 320, 370 340, 365 360 C360 380, 345 385, 335 370 C325 355, 335 330, 350 310Z" stroke="var(--color-secondary)" stroke-width="0.8" opacity="0.6"/>
+                                <path class="draw-path" d="M250 240 C240 230, 225 220, 215 225 C205 230, 210 245, 220 250" stroke="var(--color-secondary)" stroke-width="0.8" opacity="0.5"/>
+                                <path class="draw-path" d="M250 240 C260 230, 275 220, 285 225 C295 230, 290 245, 280 250" stroke="var(--color-secondary)" stroke-width="0.8" opacity="0.5"/>
+                            </g>
+                            <circle class="orbit-dot orbit-dot-1" cx="250" cy="250" r="180" stroke="var(--color-primary)" stroke-width="0.3" fill="none" opacity="0.15" stroke-dasharray="4 8"/>
+                            <circle class="orbit-dot orbit-dot-2" cx="250" cy="250" r="220" stroke="var(--color-primary)" stroke-width="0.3" fill="none" opacity="0.1" stroke-dasharray="2 12"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h2 class="section-heading reveal-up">What you can do</h2>
+                    <div class="bento-grid">
+                        <a href="#catalog" class="bento-card bento-large critical-link reveal-up">
+                            <div class="bento-icon">
+                                <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-danger)" stroke-width="1.5"><path d="M24 6L4 42h40L24 6z"/><path d="M24 18v10M24 32v2"/></svg>
+                            </div>
+                            <div class="bento-content">
+                                <h3>Most Dangerous Species</h3>
+                                <p>Plants requiring immediate attention and response in your region</p>
+                            </div>
+                            <svg class="bento-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="#identifier" class="bento-card identify-link reveal-up">
+                            <div class="bento-icon">
+                                <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><path d="M24 4C16 12, 8 22, 10 34C12 42, 20 46, 24 44C28 46, 36 42, 38 34C40 22, 32 12, 24 4Z"/><path d="M24 4L24 44" opacity="0.5"/></svg>
+                            </div>
+                            <div class="bento-content">
+                                <h3>Identify a Plant</h3>
+                                <p>Step-by-step identification assistant</p>
+                            </div>
+                            <svg class="bento-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                        <a href="#action" class="bento-card report-link reveal-up">
+                            <div class="bento-icon">
+                                <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><path d="M8 8v32M8 8l28 12-28 12"/></svg>
+                            </div>
+                            <div class="bento-content">
+                                <h3>Report a Finding</h3>
+                                <p>Instructions and resources for reporting</p>
+                            </div>
+                            <svg class="bento-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stats-container reveal-up">
+                        <div class="stat-item">
+                            <div class="stat-number" data-stat="plants" data-target="18">0</div>
+                            <div class="stat-label">Plant Species</div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-stat="danger-levels" data-target="5">0</div>
+                            <div class="stat-label">Danger Levels</div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-stat="methods" data-target="50" data-suffix="+">0</div>
+                            <div class="stat-label">Control Methods</div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-stat="types" data-target="4">0</div>
+                            <div class="stat-label">Plant Types</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="site-footer"></footer>
+        </section>
+
+        <section id="catalog" class="page">
+            <div class="page-container">
+                <div class="page-header reveal-up">
+                    <h2 class="page-title">Species Catalog</h2>
+                    <p class="page-subtitle">Browse the database of invasive plant species worldwide</p>
+                </div>
+
+                <div class="catalog-toolbar">
+                    <div class="search-container reveal-up">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                        <input type="text" id="plantSearch" placeholder="Search by name or description..." aria-label="Search plants">
+                        <button class="search-clear" id="searchClear" aria-label="Clear search">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="filter-tags reveal-up">
+                        <button class="filter-tag active" data-filter="all">All</button>
+                        <button class="filter-tag" data-filter="tree">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C8 6, 4 10, 6 16h4v6h4v-6h4c2-6-2-10-6-14z"/></svg>
+                            <span>Trees</span>
+                        </button>
+                        <button class="filter-tag" data-filter="shrub">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4C8 8, 4 12, 6 18h12c2-6-2-10-6-14z"/><path d="M8 22h8"/></svg>
+                            <span>Shrubs</span>
+                        </button>
+                        <button class="filter-tag" data-filter="herb">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22V8M12 8C8 4, 4 6, 4 10s4 6 8 2M12 8c4-4, 8-2, 8 2s-4 6-8 2"/></svg>
+                            <span>Herbs</span>
+                        </button>
+                        <button class="filter-tag" data-filter="vine">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 20C8 16, 12 12, 16 8c2-2, 4-2, 4 0s-2 4-4 4c-4 0-8 4-12 8z"/><path d="M12 12c0-4, 2-8, 6-8"/></svg>
+                            <span>Vines</span>
+                        </button>
+                        <button class="filter-tag" data-filter="critical">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 22h20L12 2z"/><path d="M12 10v4M12 18v1"/></svg>
+                            <span>Critical</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="plantCatalog" class="catalog-grid"></div>
+
+                <div id="noResults" class="no-results" style="display: none;">
+                    <svg class="no-results-icon" viewBox="0 0 80 80" fill="none" stroke="var(--color-muted)" stroke-width="1.5">
+                        <path d="M40 10C25 20, 15 35, 20 55C25 70, 35 75, 40 72C45 75, 55 70, 60 55C65 35, 55 20, 40 10Z"/>
+                        <path d="M40 10L40 72" opacity="0.5"/>
+                        <path d="M30 40h20" opacity="0.3"/>
+                    </svg>
+                    <h3>No Plants Found</h3>
+                    <p>Try adjusting your search or filter parameters</p>
+                </div>
+            </div>
+            <footer class="site-footer"></footer>
+        </section>
+
+        <section id="identifier" class="page">
+            <div class="page-container">
+                <div class="page-header reveal-up">
+                    <h2 class="page-title">Plant Identifier</h2>
+                    <p class="page-subtitle">Step-by-step identification assistant</p>
+                </div>
+
+                <div class="identifier-container">
+                    <div class="identifier-progress reveal-up">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-steps">
+                            <div class="progress-step active" data-step="1">
+                                <div class="step-dot">1</div>
+                                <div class="step-label">Type</div>
+                            </div>
+                            <div class="progress-step" data-step="2">
+                                <div class="step-dot">2</div>
+                                <div class="step-label">Season</div>
+                            </div>
+                            <div class="progress-step" data-step="3">
+                                <div class="step-dot">3</div>
+                                <div class="step-label">Location</div>
+                            </div>
+                            <div class="progress-step" data-step="4">
+                                <div class="step-dot">4</div>
+                                <div class="step-label">Features</div>
+                            </div>
+                            <div class="progress-step" data-step="5">
+                                <div class="step-dot">5</div>
+                                <div class="step-label">Result</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="identifier-content">
+                        <div class="step-panel active" id="step1">
+                            <div class="step-header">
+                                <h3>Plant Type</h3>
+                                <p>Select the type of plant you found</p>
+                            </div>
+                            <div class="options-grid">
+                                <div class="option-card" data-value="tree">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 4C16 12, 8 20, 12 32h6v12h12V32h6c4-12-4-20-12-28z"/></svg>
+                                    </div>
+                                    <h4>Tree</h4>
+                                    <p>Tall plant with a single trunk</p>
+                                </div>
+                                <div class="option-card" data-value="shrub">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 8C16 14, 8 22, 12 36h24c4-14-4-22-12-28z"/><path d="M16 44h16"/><path d="M20 36v8M28 36v8"/></svg>
+                                    </div>
+                                    <h4>Shrub</h4>
+                                    <p>Plant with multiple stems</p>
+                                </div>
+                                <div class="option-card" data-value="herb">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 44V16"/><path d="M24 16C16 8, 8 12, 8 20s8 12 16 4"/><path d="M24 16c8-8, 16-4, 16 4s-8 12-16 4"/></svg>
+                                    </div>
+                                    <h4>Herb</h4>
+                                    <p>Herbaceous plant without a trunk</p>
+                                </div>
+                                <div class="option-card" data-value="vine">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 40C16 32, 24 24, 32 16c4-4, 8-4, 8 0s-4 8-8 8c-8 0-16 8-24 16z"/><path d="M24 24c0-8, 4-16, 12-16"/><path d="M16 32c-4 0-8 4-8 8"/></svg>
+                                    </div>
+                                    <h4>Vine</h4>
+                                    <p>Climbing or trailing plant</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-panel" id="step2">
+                            <div class="step-header">
+                                <h3>Time of Year</h3>
+                                <p>When did you observe the plant?</p>
+                            </div>
+                            <div class="options-grid">
+                                <div class="option-card" data-value="spring">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="24" cy="24" r="8"/><path d="M24 4v8M24 36v8M4 24h8M36 24h8M10 10l6 6M32 32l6 6M10 38l6-6M32 16l6-6"/></svg>
+                                    </div>
+                                    <h4>Spring</h4>
+                                    <p>April to May</p>
+                                </div>
+                                <div class="option-card" data-value="summer">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="24" cy="24" r="10"/><path d="M24 2v6M24 40v6M2 24h6M40 24h6M8 8l4 4M36 36l4 4M8 40l4-4M36 12l4-4"/></svg>
+                                    </div>
+                                    <h4>Summer</h4>
+                                    <p>June to August</p>
+                                </div>
+                                <div class="option-card" data-value="autumn">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 4C14 14, 8 26, 12 38C16 46, 24 46, 28 42C32 38, 30 30, 24 28C18 26, 14 30, 14 36"/><path d="M24 4L24 28"/><path d="M36 20l-4 8M40 28l-8 4"/></svg>
+                                    </div>
+                                    <h4>Autumn</h4>
+                                    <p>September to October</p>
+                                </div>
+                                <div class="option-card" data-value="winter">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 4v40M4 24h40M10 10l28 28M38 10L10 38"/><path d="M24 4l-4 6M24 4l4 6M24 44l-4-6M24 44l4-6M4 24l6-4M4 24l6 4M44 24l-6-4M44 24l-6 4"/></svg>
+                                    </div>
+                                    <h4>Winter</h4>
+                                    <p>November to March</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-panel" id="step3">
+                            <div class="step-header">
+                                <h3>Location</h3>
+                                <p>Where is the plant growing?</p>
+                            </div>
+                            <div class="options-grid">
+                                <div class="option-card" data-value="wasteland">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 36l12-20, 8 12, 8-8, 12 16z"/><path d="M4 36h40"/><path d="M20 16l-2-4M28 20l2-6"/></svg>
+                                    </div>
+                                    <h4>Wasteland</h4>
+                                    <p>Abandoned or vacant areas</p>
+                                </div>
+                                <div class="option-card" data-value="forest">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 4C18 10, 10 18, 14 28h4v16h12V28h4c4-10-4-18-10-24z"/><path d="M8 44h32"/><path d="M12 20C8 24, 4 28, 6 34"/><path d="M36 20c4 4, 8 8, 6 14"/></svg>
+                                    </div>
+                                    <h4>Forest / Park</h4>
+                                    <p>Wooded areas, parks</p>
+                                </div>
+                                <div class="option-card" data-value="water">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 28c4-4, 8-4, 12 0s8 4, 12 0, 8-4, 12 0"/><path d="M4 36c4-4, 8-4, 12 0s8 4, 12 0, 8-4, 12 0"/><path d="M24 8c-4 8-8 12-8 16a8 8 0 0016 0c0-4-4-8-8-16z"/></svg>
+                                    </div>
+                                    <h4>Waterfront</h4>
+                                    <p>Rivers, lakes, ponds</p>
+                                </div>
+                                <div class="option-card" data-value="roadside">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 40h40"/><path d="M12 40V24l4-8M20 40V20l4-12M28 40V24l4-8M36 40V28l4-4"/><path d="M8 40v-8M16 40v-12M24 40v-16M32 40v-8M40 40v-4"/></svg>
+                                    </div>
+                                    <h4>Lawn / Roadside</h4>
+                                    <p>Lawns, roadsides</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-panel" id="step4">
+                            <div class="step-header">
+                                <h3>Key Features</h3>
+                                <p>Select the features you noticed (multiple allowed)</p>
+                            </div>
+                            <div class="options-grid multi-select">
+                                <div class="option-card" data-value="white_flowers">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="24" cy="24" r="6"/><path d="M24 8c-4 4-6 8-6 10s2 6 6 6 6-4, 6-6-2-6-6-10z"/><path d="M24 40c-4-4-6-8-6-10M24 40c4-4, 6-8, 6-10"/><path d="M8 24c4-4, 8-6, 10-6M40 24c-4-4-8-6-10-6"/></svg>
+                                    </div>
+                                    <h4>White Flowers</h4>
+                                </div>
+                                <div class="option-card" data-value="yellow_flowers">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><circle cx="24" cy="24" r="6"/><path d="M24 8c-4 4-6 8-6 10s2 6 6 6 6-4, 6-6-2-6-6-10z"/><path d="M24 40c-4-4-6-8-6-10M24 40c4-4, 6-8, 6-10"/></svg>
+                                    </div>
+                                    <h4>Yellow Flowers</h4>
+                                </div>
+                                <div class="option-card" data-value="pink_flowers">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="#c76b8a" stroke-width="1.5"><circle cx="24" cy="24" r="6"/><path d="M24 8c-4 4-6 8-6 10s2 6 6 6 6-4, 6-6-2-6-6-10z"/><path d="M24 40c-4-4-6-8-6-10M24 40c4-4, 6-8, 6-10"/></svg>
+                                    </div>
+                                    <h4>Pink Flowers</h4>
+                                </div>
+                                <div class="option-card" data-value="large_leaves">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="var(--color-primary)" stroke-width="1.5"><path d="M10 38C6 24, 12 10, 24 6c12 4, 18 18, 14 32-4 4-10 6-14 4-4 2-10 0-14-4z"/><path d="M24 6L24 42" opacity="0.5"/><path d="M24 16c-6 4-10 10-12 16" opacity="0.4"/><path d="M24 16c6 4, 10 10, 12 16" opacity="0.4"/></svg>
+                                    </div>
+                                    <h4>Large Leaves</h4>
+                                </div>
+                                <div class="option-card" data-value="thorny">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 4v40"/><path d="M24 10l8-4M24 18l-8-4M24 26l8-4M24 34l-8-4"/><path d="M20 42h8"/></svg>
+                                    </div>
+                                    <h4>Thorns / Spines</h4>
+                                </div>
+                                <div class="option-card" data-value="tall">
+                                    <div class="option-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 44V8"/><path d="M18 12l6-8 6 8"/><path d="M16 44h16"/><path d="M20 20l-6 4M28 20l6 4M20 30l-4 2M28 30l4 2"/></svg>
+                                    </div>
+                                    <h4>Tall</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-panel" id="step5">
+                            <div class="step-header">
+                                <h3>Identification Results</h3>
+                                <p>Plants matching your criteria</p>
+                            </div>
+                            <div id="identificationResults" class="results-container"></div>
+                        </div>
+                    </div>
+
+                    <div class="identifier-controls">
+                        <button class="btn btn-ghost" id="prevStep">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            <span>Back</span>
+                        </button>
+                        <button class="btn btn-primary" id="nextStep">
+                            <span>Next</span>
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </button>
+                        <button class="btn btn-text" id="resetIdentifier">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+                            <span>Start Over</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <footer class="site-footer"></footer>
+        </section>
+
+        <section id="action" class="page">
+            <div class="page-container">
+                <div class="page-header reveal-up">
+                    <h2 class="page-title">Take Action</h2>
+                    <p class="page-subtitle">Guidelines for dealing with invasive plants</p>
+                </div>
+
+                <div class="scenarios-tabs">
+                    <div class="tabs-container">
+                        <button class="tab-btn active" data-tab="garden">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+                            <span>On Your Property</span>
+                        </button>
+                        <button class="tab-btn" data-tab="yard">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
+                            <span>In Your Community</span>
+                        </button>
+                        <button class="tab-btn" data-tab="park">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C8 6, 4 10, 6 16h12c2-6-2-10-6-14z"/><path d="M12 16v6M8 22h8"/></svg>
+                            <span>In the Wild</span>
+                        </button>
+                        <button class="tab-btn" data-tab="replace">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22V10M12 10C8 6, 4 8, 4 12s4 6 8 2M12 10c4-4, 8-2, 8 2s-4 6-8 2"/><path d="M8 22h8"/></svg>
+                            <span>Native Alternatives</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="scenarios-content">
+                    <div class="tab-content active" id="gardenContent">
+                        <div class="scenario-header">
+                            <h3>Fighting Invasives on Your Property</h3>
+                            <p>Step-by-step guide for safe removal of invasive plants</p>
+                        </div>
+
+                        <div class="steps-timeline">
+                            <div class="timeline-line" aria-hidden="true"></div>
+                            <div class="timeline-item reveal-up">
+                                <div class="timeline-number">1</div>
+                                <div class="timeline-content">
+                                    <h4>Identification</h4>
+                                    <p>Accurately identify the species using our identifier tool.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item reveal-up">
+                                <div class="timeline-number">2</div>
+                                <div class="timeline-content">
+                                    <h4>Preparation</h4>
+                                    <p>Put on protective clothing. For Giant Hogweed, a full protective suit is required.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item reveal-up">
+                                <div class="timeline-number">3</div>
+                                <div class="timeline-content">
+                                    <h4>Removal</h4>
+                                    <p>Choose a method: mechanical, chemical, or biological control.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item reveal-up">
+                                <div class="timeline-number">4</div>
+                                <div class="timeline-content">
+                                    <h4>Disposal</h4>
+                                    <p>Dry the plants or dispose according to local regulations. Never add them to compost.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item reveal-up">
+                                <div class="timeline-number">5</div>
+                                <div class="timeline-content">
+                                    <h4>Monitoring</h4>
+                                    <p>Regularly inspect the area for 3-5 years after removal.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="method-demonstration reveal-up">
+                            <h4>Control Methods</h4>
+                            <div class="method-examples">
+                                <div class="method-example">
+                                    <div class="method-icon mechanical">
+                                        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 26l8-8M18 14l8-8"/><path d="M14 18l-4-4 8-8 4 4-8 8z"/><path d="M22 10l4-4M10 22l-4 4"/></svg>
+                                    </div>
+                                    <h5>Mechanical</h5>
+                                    <p>Digging out plants with roots using shovels and rakes.</p>
+                                </div>
+                                <div class="method-example">
+                                    <div class="method-icon chemical">
+                                        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4h8v8l4 12a4 4 0 01-4 4H12a4 4 0 01-4-4l4-12V4z"/><path d="M10 4h12"/><path d="M12 20h8" opacity="0.5"/></svg>
+                                    </div>
+                                    <h5>Chemical</h5>
+                                    <p>Applying herbicides strictly according to manufacturer instructions and local regulations.</p>
+                                </div>
+                                <div class="method-example">
+                                    <div class="method-icon agro">
+                                        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 28V12"/><path d="M16 12C12 8, 6 10, 6 16s6 8 10 4"/><path d="M16 12c4-4, 10-2, 10 4s-6 8-10 4"/><path d="M8 28h16"/></svg>
+                                    </div>
+                                    <h5>Biological</h5>
+                                    <p>Planting competitive native species or establishing ground cover.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="yardContent">
+                        <div class="scenario-header">
+                            <h3>Reporting in Your Community</h3>
+                            <p>How and where to report invasive plant findings</p>
+                        </div>
+
+                        <div class="contacts-grid">
+                            <div class="contact-card reveal-up">
+                                <div class="contact-header">
+                                    <div class="contact-icon">
+                                        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="16" cy="16" r="12"/><path d="M4 16h24M16 4c-4 4-6 8-6 12s2 8 6 12c4-4, 6-8, 6-12s-2-8-6-12z"/></svg>
+                                    </div>
+                                    <h4>iNaturalist</h4>
+                                </div>
+                                <p>A global platform for recording and sharing biodiversity observations.</p>
+                                <div class="contact-details">
+                                    <div class="detail-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                        <span>Upload photos with GPS coordinates</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                                        <span>Community-verified identifications</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="contact-card reveal-up">
+                                <div class="contact-header">
+                                    <div class="contact-icon">
+                                        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4C10 8, 6 14, 8 22c2 6, 8 8, 12 6"/><path d="M16 4L16 28" opacity="0.5"/><path d="M24 10c-2 2-4 6-4 10"/></svg>
+                                    </div>
+                                    <h4>Local Environmental Agency</h4>
+                                </div>
+                                <p>Your regional authority responsible for environmental protection and land management.</p>
+                                <div class="contact-details">
+                                    <div class="detail-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                                        <span>Search for your local environmental protection office</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="contact-card reveal-up">
+                                <div class="contact-header">
+                                    <div class="contact-icon">
+                                        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4l-12 8v12l12 4 12-4V12L16 4z"/><path d="M16 4v24M4 12l12 4 12-4"/></svg>
+                                    </div>
+                                    <h4>Invasive Species Hotlines</h4>
+                                </div>
+                                <p>Many regions have dedicated hotlines for reporting invasive species sightings.</p>
+                                <div class="contact-details">
+                                    <div class="detail-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                                        <span>Check your national or state invasive species reporting portal</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-instructions reveal-up">
+                            <h4>How to make an effective report</h4>
+                            <ol>
+                                <li>Take clear photos of the plant from multiple angles</li>
+                                <li>Record the exact location (GPS coordinates or address)</li>
+                                <li>Note the approximate number of plants</li>
+                                <li>Describe the size and condition of the plants</li>
+                                <li>Provide your contact information for follow-up</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="parkContent">
+                        <div class="scenario-header">
+                            <h3>Finding Invasives in Natural Areas</h3>
+                            <p>What to do when you discover invasive plants in parks and nature reserves</p>
+                        </div>
+
+                        <div class="warning-card reveal-up">
+                            <div class="warning-icon">
+                                <svg viewBox="0 0 32 32" fill="none" stroke="var(--color-danger)" stroke-width="1.5"><path d="M16 4L2 28h28L16 4z"/><path d="M16 12v8M16 24v1"/></svg>
+                            </div>
+                            <div class="warning-content">
+                                <h4>Important Warning</h4>
+                                <p>Do not attempt to remove plants in natural areas on your own. This may disrupt the ecosystem and may be illegal.</p>
+                            </div>
+                        </div>
+
+                        <div class="instructions-list reveal-up">
+                            <h4>Recommended steps</h4>
+                            <ol>
+                                <li>Photograph the plant, including surrounding landmarks for location reference.</li>
+                                <li>Identify the species using our identifier tool.</li>
+                                <li>Report the finding to the park or reserve administration.</li>
+                                <li>Record precise GPS coordinates using your phone's location services.</li>
+                                <li>Submit your observation to iNaturalist or a similar citizen science platform.</li>
+                            </ol>
+                        </div>
+
+                        <div class="contact-info-section reveal-up">
+                            <h4>Global resources for reporting</h4>
+                            <div class="contact-items">
+                                <div class="contact-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c-3 3-5 7-5 10s2 7 5 10c3-3, 5-7, 5-10s-2-7-5-10z"/></svg>
+                                    <div>
+                                        <strong>IUCN Invasive Species Specialist Group</strong>
+                                        <p>Global database and resources on invasive alien species</p>
+                                    </div>
+                                </div>
+                                <div class="contact-item">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+                                    <div>
+                                        <strong>GISD - Global Invasive Species Database</strong>
+                                        <p>Comprehensive information on invasive species worldwide</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="replaceContent">
+                        <div class="scenario-header">
+                            <h3>Safe Native Alternatives</h3>
+                            <p>Beautiful native plants to use instead of invasive species</p>
+                        </div>
+
+                        <div class="alternatives-container">
+                            <div class="alternative-card reveal-up">
+                                <div class="alternative-image">
+                                    <svg class="alternative-illustration" viewBox="0 0 200 160" fill="none" stroke="var(--color-primary)" stroke-width="1.2">
+                                        <path d="M100 140V60"/>
+                                        <path d="M100 60C80 40, 60 30, 50 40s0 30, 20 30 30-10, 30-10"/>
+                                        <path d="M100 60c20-20, 40-30, 50-20s0 30-20 30-30-10-30-10"/>
+                                        <path d="M100 90c-15-10-30-15-40-10s-5 20, 10 20 30-10, 30-10"/>
+                                        <path d="M100 90c15-10, 30-15, 40-10s5 20-10 20-30-10-30-10"/>
+                                        <path d="M80 140h40"/>
+                                    </svg>
+                                </div>
+                                <div class="alternative-content">
+                                    <h4>Instead of Box Elder Maple</h4>
+                                    <p><strong>Native maple species</strong> offer beautiful crowns, urban resilience, and stunning autumn colors without the invasive spread.</p>
+                                    <div class="alternative-features">
+                                        <span class="feature-tag">Native Species</span>
+                                        <span class="feature-tag">Urban Resilient</span>
+                                        <span class="feature-tag">Ornamental Foliage</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alternative-card reveal-up">
+                                <div class="alternative-image">
+                                    <svg class="alternative-illustration" viewBox="0 0 200 160" fill="none" stroke="var(--color-primary)" stroke-width="1.2">
+                                        <path d="M60 140V80M100 140V60M140 140V90"/>
+                                        <path d="M60 80c-8-12-16-16-20-12s0 16, 8 16 12-4, 12-4"/>
+                                        <path d="M60 80c8-12, 16-16, 20-12s0 16-8 16-12-4-12-4"/>
+                                        <circle cx="100" cy="50" r="12" stroke-width="1"/>
+                                        <circle cx="100" cy="50" r="6" stroke-width="0.8"/>
+                                        <path d="M140 90c-6-10-12-14-16-10s0 14, 6 14 10-4, 10-4"/>
+                                        <path d="M140 90c6-10, 12-14, 16-10s0 14-6 14-10-4-10-4"/>
+                                        <path d="M40 140h120"/>
+                                    </svg>
+                                </div>
+                                <div class="alternative-content">
+                                    <h4>Instead of Canadian Goldenrod</h4>
+                                    <p><strong>Native wildflower mixes</strong> provide long-lasting blooms, attract pollinators, and support local biodiversity.</p>
+                                    <div class="alternative-features">
+                                        <span class="feature-tag">Native Species</span>
+                                        <span class="feature-tag">Long Bloom Period</span>
+                                        <span class="feature-tag">Pollinator Friendly</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alternative-sources reveal-up">
+                            <h4>Where to find native plants</h4>
+                            <ul>
+                                <li>Local botanical gardens and native plant nurseries</li>
+                                <li>Native plant societies and conservation organizations</li>
+                                <li>Specialized garden centers with native flora sections</li>
+                                <li>Community plant swaps and seed exchanges</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="site-footer"></footer>
+        </section>
+
+        <section id="about" class="page">
+            <div class="page-container">
+                <div class="page-header reveal-up">
+                    <h2 class="page-title">About This Project</h2>
+                    <p class="page-subtitle">Open source invasive plant atlas built with care</p>
+                </div>
+
+                <div class="about-container">
+                    <div class="about-hero-card reveal-up">
+                        <svg class="about-logo-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M40 8C24 20, 12 36, 16 56C20 70, 32 76, 40 72C48 76, 60 70, 64 56C68 36, 56 20, 40 8Z" stroke="var(--color-primary)" stroke-width="2" fill="none"/>
+                            <path d="M40 8L40 72" stroke="var(--color-primary)" stroke-width="1.2" opacity="0.6"/>
+                            <path d="M40 24C30 32, 22 42, 20 52" stroke="var(--color-primary)" stroke-width="0.8" opacity="0.4"/>
+                            <path d="M40 24C50 32, 58 42, 60 52" stroke="var(--color-primary)" stroke-width="0.8" opacity="0.4"/>
+                            <path d="M40 44C32 50, 26 58, 24 64" stroke="var(--color-primary)" stroke-width="0.8" opacity="0.4"/>
+                            <path d="M40 44C48 50, 54 58, 56 64" stroke="var(--color-primary)" stroke-width="0.8" opacity="0.4"/>
+                        </svg>
+                        <h3>Green Threat</h3>
+                        <p class="about-tagline">Interactive Atlas of Invasive Plants</p>
+                        <p class="about-description">An open-source web application for identifying, learning about, and taking action against invasive plant species worldwide.</p>
+                        <div class="about-links">
+                            <a href="https://github.com/strangepelmen/GreenThreat" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                <span>View Source Code</span>
+                            </a>
+                            <a href="https://github.com/strangepelmen/GreenThreat" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                <span>Star on GitHub</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="about-grid">
+                        <div class="about-card reveal-up">
+                            <div class="about-card-icon">
+                                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 6l-6 10 6 10M24 6l6 10-6 10M18 4l-4 24"/></svg>
+                            </div>
+                            <h4>Tech Stack</h4>
+                            <div class="tech-tags">
+                                <span class="tech-tag">HTML5</span>
+                                <span class="tech-tag">CSS3</span>
+                                <span class="tech-tag">Vanilla JS</span>
+                                <span class="tech-tag">JSON</span>
+                                <span class="tech-tag">GSAP</span>
+                                <span class="tech-tag">Google Fonts</span>
+                            </div>
+                            <p>Built with pure web technologies. No frameworks or build tools.</p>
+                        </div>
+
+                        <div class="about-card reveal-up">
+                            <div class="about-card-icon">
+                                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="24" height="24" rx="4"/><path d="M4 12h24M12 12v16"/></svg>
+                            </div>
+                            <h4>Features</h4>
+                            <ul class="about-feature-list">
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Plant catalog with search and filters</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Step-by-step identifier wizard</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Detailed species information modals</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Light and dark theme support</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Fully responsive design</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Action guides for different scenarios</li>
+                            </ul>
+                        </div>
+
+                        <div class="about-card reveal-up">
+                            <div class="about-card-icon">
+                                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4l-4 8h8l-4 8"/><path d="M8 24h16"/><circle cx="16" cy="28" r="2"/></svg>
+                            </div>
+                            <h4>How It Was Built</h4>
+                            <p>Single-page application built from scratch.</p>
+                            <ul class="about-feature-list">
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> SPA-style routing without a router</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Dynamic rendering from JSON data</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> CSS custom properties for theming</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Scoring-based identification algorithm</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Local storage for theme persistence</li>
+                            </ul>
+                        </div>
+
+                        <div class="about-card reveal-up">
+                            <div class="about-card-icon">
+                                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 28s-10-6-10-14a6 6 0 0112-2 6 6 0 0112 2c0 8-10 14-10 14z" stroke="currentColor"/></svg>
+                            </div>
+                            <h4>Contributing</h4>
+                            <p>Open-source, contributions welcome.</p>
+                            <ul class="about-feature-list">
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Adding new plant species to the database</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Improving identification accuracy</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Fixing bugs and suggesting features</li>
+                                <li><svg viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="2"><path d="M3 8l4 4 6-8"/></svg> Translating to other languages</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="about-meta reveal-up">
+                        <div class="about-disclaimer">
+                            <svg class="about-disclaimer-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4L2 28h28L16 4z"/><path d="M16 12v8M16 24v1"/></svg>
+                            <div class="about-disclaimer-text">
+                                <h4>Disclaimer</h4>
+                                <p>For educational purposes only. Not a substitute for professional environmental or legal advice. Verify identification with qualified professionals. Invasive status varies by region.</p>
+                            </div>
+                        </div>
+                        <div class="about-author-block">
+                            <div class="author-avatar">
+                                <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="16" cy="12" r="6"/><path d="M6 28c0-6 4-10 10-10s10 4 10 10"/></svg>
+                            </div>
+                            <div>
+                                <div class="author-details-label">Created by</div>
+                                <a href="https://github.com/strangepelmen" target="_blank" rel="noopener noreferrer" class="author-link">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                    <span>strangepelmen</span>
+                                </a>
+                            </div>
+                            <div class="author-repo-info">
+                                <div class="repo-stat">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                    <a href="https://github.com/strangepelmen/GreenThreat" target="_blank" rel="noopener noreferrer">GreenThreat</a>
+                                </div>
+                                <a href="https://github.com/strangepelmen/GreenThreat/stargazers" target="_blank" rel="noopener noreferrer" class="repo-star-btn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    <span>Star</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="site-footer"></footer>
+        </section>
+    </main>
+
+    <nav class="bottom-nav" id="bottomNav" aria-label="Navigation">
+        <a href="#home" class="bottom-nav-link active" data-page="home">
+            <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+            <svg class="icon-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L3 12h2v9h6v-6h4v6h6v-9h2z"/></svg>
+            <span>Home</span>
+        </a>
+        <a href="#catalog" class="bottom-nav-link" data-page="catalog">
+            <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg class="icon-filled" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="6" width="16" height="2" rx="1"/><rect x="4" y="11" width="16" height="2" rx="1"/><rect x="4" y="16" width="16" height="2" rx="1"/></svg>
+            <span>Catalog</span>
+        </a>
+        <a href="#identifier" class="bottom-nav-link" data-page="identifier">
+            <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <svg class="icon-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M11 3a8 8 0 105.29 14.12l3.3 3.29a1 1 0 001.41-1.42l-3.29-3.3A8 8 0 0011 3zm0 2a6 6 0 110 12 6 6 0 010-12z"/></svg>
+            <span>Identify</span>
+        </a>
+        <a href="#action" class="bottom-nav-link" data-page="action">
+            <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 8v32M8 8l28 12-28 12"/></svg>
+            <svg class="icon-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M8 4.5v15l13-7.5z"/></svg>
+            <span>Action</span>
+        </a>
+        <a href="#about" class="bottom-nav-link" data-page="about">
+            <svg class="icon-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <svg class="icon-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 6h4v2h-4V8zm0 4h4v6h-4v-6z"/></svg>
+            <span>About</span>
+        </a>
+    </nav>
+
+    <div id="plantModal" class="modal" role="dialog" aria-modal="true" aria-label="Plant details">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <button class="modal-close" aria-label="Close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <div id="plantModalContent"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
